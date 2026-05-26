@@ -68,7 +68,7 @@
   </header>
 
   <h1>What does it mean for DAPO loss aggregation to become <strong>relatively</strong> stronger with response length?</h1>
-  <p class="subtitle"><em>Reading GRPO and DAPO loss aggregation through per-response vote counts</em></p>
+  <p class="subtitle"><em>Reading GRPO and DAPO loss aggregation through per-response vote count</em></p>
 
   <nav class="toc" aria-label="Contents">
     <p class="toc-title">Contents</p>
@@ -77,7 +77,7 @@
       <li><a href="#motivation">1. Where the question came from</a></li>
       <li><a href="#grpo">2. Derivation of GRPO vote count \(m_i = 1/G\)</a></li>
       <li><a href="#dapo">3. Derivation of DAPO vote count \(m_i = L_i / L_{\mathrm{tot}}\)</a></li>
-      <li><a href="#comparison">4. What to compare DAPO's vote counts against</a></li>
+      <li><a href="#comparison">4. What to compare DAPO's vote count against</a></li>
       <li><a href="#references">References</a></li>
     </ul>
   </nav>
@@ -168,8 +168,8 @@
   </div>
   <p>From (3), \(m_i^{\mathrm{DAPO}} = L_i/L_{\mathrm{tot}}\) is the share of \(L_i\) in the group's total token count, which becomes the vote count directly (share with \(L_{\mathrm{tot}}\) in the denominator). The next question is what to compare this vote count against.</p>
 
-  <h2 id="comparison">4. What to compare DAPO's vote counts against</h2>
-  <p>Next, compare DAPO's vote counts \(m_i^{\mathrm{DAPO}}\) against two different baselines.</p>
+  <h2 id="comparison">4. What to compare DAPO's vote count against</h2>
+  <p>Next, compare DAPO's vote count \(m_i^{\mathrm{DAPO}}\) against two different baselines.</p>
 
   <h3>Derivation 1: vote count relative to GRPO</h3>
   <p>When GRPO is used as the baseline, how large is DAPO's vote count for one response? Place GRPO's vote count \(m_i^{\mathrm{GRPO}}\) in the denominator and take the ratio \(m_i^{\mathrm{DAPO}} / m_i^{\mathrm{GRPO}}\). From (2) and (3),</p>
