@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shota Kaji</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 40rem; margin: 0 auto; padding: 1.5rem; }
+    .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem; }
+    .site-brand { color: inherit; font-size: 1.5rem; font-weight: 700; margin: 0; text-decoration: none; white-space: nowrap; }
+    .site-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; justify-content: flex-end; font-size: 0.9rem; }
+    .site-nav a { color: inherit; text-decoration: none; }
+    .site-nav a:hover { color: #0b57d0; }
+    .site-nav .current { color: #c026d3; }
+    .role { color: #555; font-size: 0.95rem; margin: 0; }
+    section { margin: 1.5rem 0; }
+    h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    ul.links { list-style: none; padding: 0; margin: 0; }
+    ul.links li { margin: 0.35rem 0; }
+    a { color: #0b57d0; }
+    .highlight { background: #f0f4ff; color: #1f2937; padding: 0.75rem 1rem; border-radius: 6px; margin: 0.75rem 0; font-size: 0.95rem; }
+    .highlight a { color: #0b57d0; }
+    footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #ccc; font-size: 0.85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1 class="site-brand">Shota Kaji</h1>
+      <p class="role">Independent Researcher</p>
+    </div>
+    <nav class="site-nav" aria-label="Primary">
+      <span class="current">home</span>
+      <a href="blog/en/index.html">blog</a>
+      <a href="ja/index.html" lang="ja">日本語</a>
+    </nav>
+  </header>
+
+  <section>
+    <h2>Research interests</h2>
+    <p>Post-training of large language models (especially RL for LLMs).</p>
+  </section>
+
+  <section>
+    <h2>Links</h2>
+    <ul class="links">
+      <li><a href="https://github.com/ShotaKaji5207">GitHub</a></li>
+      <li><a href="mailto:shotak.5207@gmail.com">Email</a></li>
+      <!-- <li><a href="https://twitter.com/">X (Twitter)</a> (placeholder)</li> -->
+      <!-- <li><a href="#">CV (PDF)</a> (placeholder)</li> -->
+    </ul>
+  </section>
+
+  <section>
+    <h2>Writing &amp; materials</h2>
+    <ul class="links">
+      <li><a href="blog/en/index.html">Blog</a></li>
+      <li><a href="notebooks/en/index.html">Colab notebooks</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Highlights</h2>
+    <div class="highlight">
+      <p>FT-LLM 2026 (NLP2026 workshop), math task track, Team Victory (チーム・ビクトリー) — RLVR role. 3rd overall, 2nd in the open track.</p>
+      <p><a href="https://llm-jp.github.io/tuning-competition/2026/workshop.html">Workshop page</a> · <a href="https://github.com/HayatoHongo/LLM-jp-2025competetion-victory/tree/main/open-instruct">RLVR repository (using open-instruct)</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Copyright © 2026 Shota Kaji</p>
+  </footer>
+</body>
+</html>

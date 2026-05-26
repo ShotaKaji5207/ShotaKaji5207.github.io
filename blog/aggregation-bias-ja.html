@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DAPO の loss 集約が応答長に応じて相対的に強まるとは</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: sans-serif; padding: 24px; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+    .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; border-bottom: 1px solid #dee2e6; padding-bottom: 0.9rem; }
+    .site-brand { color: inherit; font-weight: 700; text-decoration: none; white-space: nowrap; }
+    .site-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; justify-content: flex-end; font-size: 0.9rem; }
+    .site-nav a { color: inherit; text-decoration: none; }
+    .site-nav a:hover { color: #0b57d0; }
+    .site-nav .current { color: #c026d3; }
+    h1 { font-size: 1.4rem; font-weight: 500; margin-top: 1.5em; border-bottom: 1px solid #dee2e6; padding-bottom: 0.3em; }
+    h1 strong { font-weight: 700; }
+    .subtitle { margin: 0.4em 0 1.2em; color: #6c757d; font-size: 0.95rem; }
+    h2 { font-size: 1.15rem; margin-top: 2em; margin-bottom: 0.6em; color: #495057; }
+    h3 { font-size: 1rem; margin-top: 1.4em; margin-bottom: 0.4em; color: #6c757d; }
+    p { margin: 0.85em 0; }
+    ul, ol { margin: 0.75em 0; }
+    .formula { background: #f8f9fa; color: #1f2937; padding: 12px 16px; border-radius: 6px; margin: 14px 0; overflow-x: auto; }
+    code { font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9em; background: #eee; color: #1f2937; padding: 2px 6px; border-radius: 4px; }
+    table { border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; width: 100%; }
+    th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; }
+    th { background: #f8f9fa; }
+    .note { background: #fff3cd; color: #1f2937; padding: 10px; border-radius: 6px; margin: 8px 0; font-size: 0.9rem; }
+    .loss-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1rem 0; align-items: stretch; }
+    .loss-pair .loss-col { border: 1px solid #dee2e6; border-radius: 6px; padding: 0.75rem 1rem; background: #f9fafb; }
+    .loss-pair .loss-label { font-size: 0.95rem; font-weight: 600; text-align: center; margin: 0 0 0.5rem; color: #374151; }
+    .toc { margin: 0.5rem 0 1.5rem; font-size: 0.95rem; }
+    .toc-title { font-weight: 600; margin: 0 0 0.4rem; }
+    .toc ul { margin: 0; padding-left: 1.4rem; }
+    .toc li { margin: 0.2rem 0; }
+    .toc a { color: inherit; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .conclusion-heading { margin-top: 2.5em; }
+    .footnote { font-size: 0.9rem; color: #6c757d; }
+    sup a { text-decoration: none; }
+    @media (prefers-color-scheme: dark) {
+      .site-header, h1 { border-bottom-color: #374151; }
+      .site-nav a:hover { color: #8ab4f8; }
+      .site-nav .current { color: #f0abfc; }
+      .subtitle { color: #a1a1aa; }
+      h2 { color: #d1d5db; }
+      h3 { color: #a1a1aa; }
+      a { color: #8ab4f8; }
+      .formula, th { background: #111827; color: #e5e7eb; }
+      code { background: #1f2937; color: #e5e7eb; }
+      th, td { border-color: #374151; }
+      .note { background: #3a2f12; color: #fde68a; }
+      .loss-pair .loss-col { border-color: #374151; background: #111827; }
+      .loss-pair .loss-label { color: #e5e7eb; }
+      .footnote { color: #a1a1aa; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-brand" href="../ja/index.html">Shota Kaji</a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="../ja/index.html">home</a>
+      <a class="current" href="index.html">blog</a>
+      <a href="aggregation-bias-en.html" hreflang="en" lang="en">English</a>
+    </nav>
+  </header>
+
+  <h1>DAPO の loss 集約が応答長に応じて<strong>相対的に</strong>強まるとは</h1>
+  <p class="subtitle"><em>GRPO と DAPO の loss 集約を 1応答単位の票数で読む</em></p>
+
+  <nav class="toc" aria-label="目次">
+    <p class="toc-title">目次</p>
+    <ul>
+      <li><a href="#notation">0. 定義と結論</a></li>
+      <li><a href="#motivation">1. 問いの出発点</a></li>
+      <li><a href="#grpo">2. GRPO票数 \(m_i = 1/G\) の導出</a></li>
+      <li><a href="#dapo">3. DAPO票数 \(m_i = L_i / L_{\mathrm{tot}}\) の導出</a></li>
+      <li><a href="#comparison">4. DAPO の票数を何と比べるか</a></li>
+      <li><a href="#references">参考文献</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="notation">0. 定義と結論</h2>
+  <p>1応答単位における<strong>票数</strong> \(m_i\) を定義する。票数という語は比喩であり、以下の数式への橋渡しとして使う。これは、応答 \(i\) に属する全トークンの集約重み \(w_{i,t}\) を足したものである。</p>
+  <div class="formula">
+    \[
+    m_i := \sum_{t=1}^{L_i} w_{i,t} \tag{1}
+    \]
+  </div>
+  <ul>
+    <li>\(m_i\): 応答 \(i\) の票数</li>
+    <li>\(L_i\): 応答 \(i\) の長さ（トークン数）</li>
+    <li>\(G\): グループサイズ（同一プロンプトから生成した応答本数）</li>
+    <li>\(w_{i,t}\): トークン \((i,t)\) の per-token 集約重み</li>
+    <li>\(\ell_{i,t}\): トークン \((i,t)\) の per-token loss</li>
+    <li>\(L_{\mathrm{tot}}\): グループ内総トークン数。\(L_{\mathrm{tot}} := \sum_{j=1}^{G} L_j\)</li>
+    <li>\(\bar{L}_g\): グループ内の平均応答長。 \(\bar{L}_g := L_{\mathrm{tot}} / G\)</li>
+  </ul>
+  <p>結論を先に言うと、GRPO 票数 \(1/G\) と DAPO 票数 \(L_i/L_{\mathrm{tot}}\) の比（および DAPO 内平均との比）は、いずれも \(L_i/\bar{L}_g\) になる。GRPO では \(m_i^{\mathrm{GRPO}} = 1/G\) である。一方 DAPO では \(m_i^{\mathrm{DAPO}} = L_i/L_{\mathrm{tot}}\) である。</p>
+  <div class="formula">
+    \[
+    m_i^{\mathrm{GRPO}} = \frac{1}{G}, \qquad
+    m_i^{\mathrm{DAPO}} = \frac{L_i}{L_{\mathrm{tot}}}, \qquad
+    \frac{m_i^{\mathrm{DAPO}}}{m_i^{\mathrm{GRPO}}} = \frac{m_i^{\mathrm{DAPO}}}{\bar{m}^{\mathrm{DAPO}}} = \frac{L_i}{\bar{L}_g}
+    \]
+  </div>
+
+  <h2 id="motivation">1. 問いの出発点</h2>
+  <p>DeepSeekMath の GRPO に比べて、DAPO は応答長に応じて正解または不正解時の loss 寄与が相対的に強まる、と理解していた。しかし、その<strong>相対的に</strong>が何を意味するのかまでは、明確には理解していなかった。補足すると、相対的という語は、何に対して何倍かという問いをアプリオリ<sup><a href="#fn-1" id="ref-1">1</a></sup>にすでに含む。そこで、2つのアルゴリズムを比べてみると、GRPO はサンプルレベルの loss 集約と呼ばれ、DAPO はトークンレベルの loss 集約と呼ばれる。オリジナルの GRPO のように、1サンプル、つまり1応答単位で双方を統一できれば比較できるはずだと考え、1応答単位における票数 \(m_i\) を定義した。比較を代数的に進めていくと、上記の結論に至る。</p>
+
+  <div class="loss-pair">
+    <div class="loss-col">
+      <p class="loss-label">Sample-level loss</p>
+      <div class="formula" style="margin:0;">
+        \[
+        L_{\mathrm{GRPO}} = \frac{1}{G} \sum_{i=1}^{G} \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \ell_{i,t}
+        \]
+      </div>
+    </div>
+    <div class="loss-col">
+      <p class="loss-label">Token-level loss</p>
+      <div class="formula" style="margin:0;">
+        \[
+        L_{\mathrm{DAPO}} = \frac{1}{\sum_{j=1}^{G} |o_j|} \sum_{i=1}^{G} \sum_{t=1}^{|o_i|} \ell_{i,t}
+        \]
+      </div>
+    </div>
+  </div>
+  <p>以下では \(L_i = |o_i|\) として同じ形を \(L_i\) 表記で書き直し、集約重み \(w_{i,t}\) を読む。</p>
+
+  <h2 id="grpo">2. GRPO票数 \(m_i = 1/G\) の導出</h2>
+  <p>式(1)の票数 \(m_i\) は、その応答に属する集約重み \(w_{i,t}\) を全て足したものである。(i) ただし \(\ell_{i,t}\) は含まない。票数は集約重みの和であり、loss 値に依存せず、集約重みだけで決まる。(ii) ここでは group-relative advantage と対応づけるため、group-local な集約として読む。以下、GRPO の元の式から \(w_{i,t}\) を読む。</p>
+  <p>(i)(ii) の2点が本稿のスコープである。</p>
+  <p>元の式:</p>
+  <div class="formula">
+    \[
+    \mathcal{L}_{\mathrm{GRPO}} = \frac{1}{G} \sum_{i=1}^{G} \left( \frac{1}{L_i} \sum_{t=1}^{L_i} \ell_{i,t} \right)
+    \]
+  </div>
+  <p>二重和に展開:</p>
+  <div class="formula">
+    \[
+    \mathcal{L}_{\mathrm{GRPO}} = \sum_{i=1}^{G} \sum_{t=1}^{L_i} \frac{1}{G L_i} \,\ell_{i,t}
+    \]
+  </div>
+  <p>したがって \(w_{i,t}^{\mathrm{GRPO}} = \frac{1}{G L_i}\)。応答内で足し上げると:</p>
+  <div class="formula">
+    \[
+    m_i^{\mathrm{GRPO}} = \sum_{t=1}^{L_i} \frac{1}{G L_i} = \frac{L_i}{G L_i} = \frac{1}{G} \tag{2}
+    \]
+  </div>
+  <p>GRPO では、各応答の票数は \(1/G\) で等しい。</p>
+
+  <h2 id="dapo">3. DAPO票数 \(m_i = L_i / L_{\mathrm{tot}}\) の導出</h2>
+  <p>元の式:</p>
+  <div class="formula">
+    \[
+    \mathcal{L}_{\mathrm{DAPO}} = \frac{1}{L_{\mathrm{tot}}} \sum_{i=1}^{G} \sum_{t=1}^{L_i} \ell_{i,t}
+    \]
+  </div>
+  <p>したがって \(w_{i,t}^{\mathrm{DAPO}} = \frac{1}{L_{\mathrm{tot}}}\)。応答内で足し上げると:</p>
+  <div class="formula">
+    \[
+    m_i^{\mathrm{DAPO}} = \sum_{t=1}^{L_i} \frac{1}{L_{\mathrm{tot}}} = \frac{L_i}{L_{\mathrm{tot}}} \tag{3}
+    \]
+  </div>
+  <p>式(3)より、\(m_i^{\mathrm{DAPO}} = L_i/L_{\mathrm{tot}}\) は、グループ内トークン総数に占める \(L_i\) の割合がそのまま票数になる（\(L_{\mathrm{tot}}\) を分母にしたシェア）。では、この票数を何と比べればよいか。</p>
+
+  <h2 id="comparison">4. DAPO の票数を何と比べるか</h2>
+  <p>次に、DAPO の票数 \(m_i^{\mathrm{DAPO}}\) を、2通りの基準と比べる。</p>
+
+  <h3>導出1: GRPO を基準にした票数</h3>
+  <p>GRPO を基準としたとき、DAPO の1応答の票数はどれくらいだろうか。分母に GRPO の票数 \(m_i^{\mathrm{GRPO}}\) を置き、応答票数の比 \(m_i^{\mathrm{DAPO}} / m_i^{\mathrm{GRPO}}\) を取る。式(2),(3)より、</p>
+  <div class="formula">
+    \[
+    \frac{m_i^{\mathrm{DAPO}}}{m_i^{\mathrm{GRPO}}} = \frac{L_i / L_{\mathrm{tot}}}{1/G} = \frac{L_i}{L_{\mathrm{tot}}/G} = \frac{L_i}{\bar{L}_g} \tag{4}
+    \]
+  </div>
+
+  <h3>導出2: 平均応答票数を基準にした票数</h3>
+  <p>DAPO の平均応答票数を基準としたとき、1応答の票数はどれくらいだろうか。まず、式(3)より、DAPO の平均応答票数は</p>
+  <div class="formula">
+    \[
+    \bar{m}^{\mathrm{DAPO}} = \frac{1}{G} \sum_{i=1}^{G} m_i^{\mathrm{DAPO}} = \frac{1}{G} \sum_{i=1}^{G} \frac{L_i}{L_{\mathrm{tot}}} = \frac{1}{G L_{\mathrm{tot}}} \sum_{i=1}^{G} L_i = \frac{L_{\mathrm{tot}}}{G L_{\mathrm{tot}}} = \frac{1}{G} \tag{5}
+    \]
+  </div>
+  <p>DAPO では応答票数をグループ平均すると長さの差は消え、ちょうど \(1/G\) になる。これは GRPO の \(m_i^{\mathrm{GRPO}} = 1/G\) と数として一致する。</p>
+  <p>次に、DAPO の応答票数 \(m_i^{\mathrm{DAPO}}\) を平均応答票数 \(\bar{m}^{\mathrm{DAPO}}\) と比較する。</p>
+  <div class="formula">
+    \[
+    \frac{m_i^{\mathrm{DAPO}}}{\bar{m}^{\mathrm{DAPO}}} = \frac{\text{応答 } i \text{ の票数}}{\text{平均的な応答の票数}} = \frac{L_i / L_{\mathrm{tot}}}{1/G} = \frac{L_i}{L_{\mathrm{tot}}/G} = \frac{L_i}{\bar{L}_g} \tag{6}
+    \]
+  </div>
+
+  <h2 class="conclusion-heading">結論</h2>
+  <p>出発点は、DAPO の集約において相対的とは何に対して何倍か、という問いだった。答えは、平均応答長 \(\bar{L}_g\) に対して、倍率 \(L_i / \bar{L}_g\) である。\(m_i = L_i/L_{\mathrm{tot}}\) は DAPO の1応答単位の票数そのものであり、グループ内の絶対シェア（全体に対する割合）を表す。\(L_i/\bar{L}_g\) は GRPO の票数、または DAPO 内の平均応答票数を基準に読んだ相対比である。</p>
+
+  <h2 id="references">参考文献</h2>
+  <ol>
+    <li>Nathan Lambert. <em>Recent reasoning research: GRPO tweaks, base model RL, and data curation</em>. Interconnects AI, 2025. <a href="https://www.interconnects.ai/p/papers-im-reading-base-model-rl-grpo">https://www.interconnects.ai/p/papers-im-reading-base-model-rl-grpo</a></li>
+    <li>DeepSeek. <em>DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models</em>. arXiv:2402.03300, 2024. <a href="https://arxiv.org/abs/2402.03300">https://arxiv.org/abs/2402.03300</a></li>
+    <li>DAPO. <em>DAPO: An Open-Source LLM Reinforcement Learning System at Scale</em>. arXiv:2503.14476, 2025. <a href="https://arxiv.org/abs/2503.14476">https://arxiv.org/abs/2503.14476</a></li>
+  </ol>
+
+  <p class="footnote" id="fn-1">1. §1 は発見の順序で書かれているが、relative がすでにその問いを a priori に含む、と気づいたのは a posteriori だった。 <a href="#ref-1" aria-label="本文へ戻る">↩</a></p>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog — Shota Kaji</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 40rem; margin: 0 auto; padding: 1.5rem; }
+    .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem; }
+    .site-brand { color: inherit; font-weight: 700; text-decoration: none; white-space: nowrap; }
+    .site-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; justify-content: flex-end; font-size: 0.9rem; }
+    .site-nav a { color: inherit; text-decoration: none; }
+    .site-nav a:hover { color: #0b57d0; }
+    .site-nav .current { color: #c026d3; }
+    h1 { font-size: 1.35rem; margin: 0 0 0.5rem; }
+    ul.posts { list-style: none; padding: 0; margin: 0; }
+    ul.posts li { margin: 1rem 0; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+    ul.posts li:last-child { border-bottom: none; }
+    .title { font-weight: 600; }
+    .meta { font-size: 0.85rem; color: #666; margin-top: 0.25rem; }
+    .soon { color: #888; font-style: italic; }
+    a { color: #0b57d0; }
+    footer { margin-top: 2rem; font-size: 0.85rem; color: #666; }
+    @media (prefers-color-scheme: dark) {
+      .site-header { border-bottom-color: #374151; }
+      .site-nav a:hover { color: #8ab4f8; }
+      .site-nav .current { color: #f0abfc; }
+      ul.posts li { border-bottom-color: #2f3542; }
+      .meta, footer { color: #a1a1aa; }
+      .soon { color: #9ca3af; }
+      a { color: #8ab4f8; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-brand" href="../../index.html">Shota Kaji</a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="../../index.html">home</a>
+      <span class="current">blog</span>
+      <a href="../index.html" lang="ja">日本語</a>
+    </nav>
+  </header>
+
+  <ul class="posts">
+    <li>
+      <div class="title"><a href="../aggregation-bias-en.html">What does it mean for DAPO loss aggregation to become relatively stronger with response length?</a></div>
+      <div class="meta">Theory note · 2026/05/26</div>
+    </li>
+  </ul>
+
+  <footer>
+    <p><a href="../../index.html">← Home</a></p>
+  </footer>
+</body>
+</html>
